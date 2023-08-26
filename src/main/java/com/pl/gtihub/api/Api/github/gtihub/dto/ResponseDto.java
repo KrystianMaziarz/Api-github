@@ -9,7 +9,7 @@ import lombok.Value;
 @Value
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
-public class FinalResponse {
+public class ResponseDto {
 
   String repositoryName;
 

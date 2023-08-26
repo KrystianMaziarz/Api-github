@@ -1,9 +1,9 @@
 package com.pl.gtihub.api.Api.github.gtihub;
 
-import com.pl.gtihub.api.Api.github.gtihub.dto.FinalResponse;
+import com.pl.gtihub.api.Api.github.gtihub.dto.ResponseDto;
 import java.util.List;
 
 public interface GitHubService {
 
-  List<FinalResponse> getRepositories(String username, String acceptHeader);
+  List<ResponseDto> getRepositories(String username, String acceptHeader);
 }

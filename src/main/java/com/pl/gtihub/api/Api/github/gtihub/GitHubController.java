@@ -1,6 +1,6 @@
 package com.pl.gtihub.api.Api.github.gtihub;
 
-import com.pl.gtihub.api.Api.github.gtihub.dto.FinalResponse;
+import com.pl.gtihub.api.Api.github.gtihub.dto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -17,7 +17,7 @@ public class GitHubController {
 
   @GetMapping(value = "/repositories/{username}")
   @Operation(description = "Get a list of all repositories")
-  public List<FinalResponse> getRepositories(
+  public List<ResponseDto> getRepositories(
       @PathVariable @Schema(description = "Github username", example = "KrystianMaziarz")
           String username,
       @RequestHeader(value = HttpHeaders.ACCEPT)

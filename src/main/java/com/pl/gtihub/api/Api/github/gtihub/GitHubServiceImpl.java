@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -22,14 +21,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class GitHubServiceImpl implements GitHubService {
 
   private final RestTemplate restTemplate;
 
   private final HeaderValidator headerValidator;
 
-  public List<FinalResponse> getRepositories(String userName, String acceptHeader) {
+  public List<ResponseDto> getRepositories(String userName, String acceptHeader) {
 
     headerValidator.checkHeader(acceptHeader);
 
@@ -46,7 +44,7 @@ public class GitHubServiceImpl implements GitHubService {
               uri,
               HttpMethod.GET,
               null,
-              new ParameterizedTypeReference<List<RepositoryResponse>>() {});
+              new ParameterizedTypeReference<List<RepositoryGithubResponseDto>>() {});
 
       return Optional.ofNullable(response.getBody())
           .map(this::processResponse)
@@ -75,37 +73,45 @@ public class GitHubServiceImpl implements GitHubService {
 
     var response =
         restTemplate.exchange(
-            uri, HttpMethod.GET, null, new ParameterizedTypeReference<List<BranchResponse>>() {});
+            uri,
+            HttpMethod.GET,
+            null,
+            new ParameterizedTypeReference<List<BranchGithubResponseDto>>() {});
 
     return Optional.ofNullable(response.getBody())
-        .map(
-            body ->
-                body.stream()
-                    .map(
-                        branchResponse ->
-                            new BranchDto(
-                                branchResponse.getName(),
-                                Optional.ofNullable(branchResponse.getCommitDto())
-                                    .map(CommitDto::getSha)
-                                    .orElse(null)))
-                    .toList())
+        .map(getBranchGithubResponseDtoList())
         .orElse(Collections.emptyList());
   }
 
-  private List<FinalResponse> processResponse(List<RepositoryResponse> repositoryResponses) {
-    return repositoryResponses.stream()
-        .filter(repositoryResponse -> Boolean.FALSE.equals(repositoryResponse.isFork()))
-        .map(getRepositoryResponseFinalResponse())
+  private List<ResponseDto> processResponse(
+      List<RepositoryGithubResponseDto> repositoryGithubResponseDtoList) {
+    return repositoryGithubResponseDtoList.stream()
+        .filter(repositoryResponseDto -> Boolean.FALSE.equals(repositoryResponseDto.isFork()))
+        .map(getResponseDto())
         .toList();
   }
 
-  private Function<RepositoryResponse, FinalResponse> getRepositoryResponseFinalResponse() {
-    return repositoryResponse ->
-        new FinalResponse(
-            repositoryResponse.getRepositoryName(),
-            repositoryResponse.getOwnerLogin().getLogin(),
+  private Function<RepositoryGithubResponseDto, ResponseDto> getResponseDto() {
+    return repositoryResponseDto ->
+        new ResponseDto(
+            repositoryResponseDto.getRepositoryName(),
+            repositoryResponseDto.getOwnerLogin().getLogin(),
             getBranches(
-                repositoryResponse.getOwnerLogin().getLogin(),
-                repositoryResponse.getRepositoryName()));
+                repositoryResponseDto.getOwnerLogin().getLogin(),
+                repositoryResponseDto.getRepositoryName()));
+  }
+
+  private static Function<List<BranchGithubResponseDto>, List<BranchDto>>
+      getBranchGithubResponseDtoList() {
+    return responseBody ->
+        responseBody.stream()
+            .map(
+                branchGithubResponseDto ->
+                    new BranchDto(
+                        branchGithubResponseDto.getName(),
+                        Optional.ofNullable(branchGithubResponseDto.getCommitDto())
+                            .map(CommitGithubResponseDto::getSha)
+                            .orElse(null)))
+            .toList();
   }
 }
