@@ -20,4 +20,12 @@ public class GithubExceptionHandler {
         new ErrorMessage(HttpStatus.NOT_ACCEPTABLE.value(), ex.getMessage()),
         HttpStatus.NOT_ACCEPTABLE);
   }
+
+  @ExceptionHandler(ServerNotRespondingException.class)
+  public ResponseEntity<ErrorMessage> handleInternalServerErrorException(
+      ServerNotRespondingException ex) {
+    return new ResponseEntity<>(
+        new ErrorMessage(HttpStatus.NOT_ACCEPTABLE.value(), ex.getMessage()),
+        HttpStatus.NOT_ACCEPTABLE);
+  }
 }
