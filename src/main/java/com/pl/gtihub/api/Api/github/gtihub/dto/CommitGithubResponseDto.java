@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CommitDto {
+public class CommitGithubResponseDto {
 
   @JsonProperty("sha")
   String sha;

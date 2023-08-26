@@ -8,14 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RepositoryResponse {
+public class OwnerGithubResponseDto {
 
-  @JsonProperty("name")
-  String repositoryName;
-
-  @JsonProperty("owner")
-  OwnerDto ownerLogin;
-
-  @JsonProperty("fork")
-  boolean isFork;
+  @JsonProperty("login")
+  String login;
 }
